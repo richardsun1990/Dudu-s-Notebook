@@ -8,7 +8,7 @@ export const detectAndAnalyzeQuestions = async (
   subject: Subject
 ): Promise<AIAnalysis[]> => {
   // 切换为 Flash 模型以大幅提升识别速度
-  const model = 'gemini-1.5-flash';
+  const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
   
   const systemPrompt = `你是一个资深的小学${subject}教育专家。
   用户上传了[${base64Images.length}]张作业照片。
