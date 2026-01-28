@@ -38,7 +38,7 @@ export const detectAndAnalyzeQuestions = async (
         { text: "请分析图中的题目，输出JSON格式结果。" }
       ],
     },
-    config: {
+   generationConfig: {
       systemInstruction: systemPrompt,
       responseMimeType: "application/json",
       responseSchema: {
