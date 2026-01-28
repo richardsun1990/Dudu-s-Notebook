@@ -1,17 +1,12 @@
 'use client';
 import React from 'react';
-// 确保路径指向你 components 文件夹下的实际文件名
 import GamificationHeader from '../components/GamificationHeader';
 import ImageUploader from '../components/ImageUploader';
 
 export default function Home() {
-  const handleResults = (data: any) => {
-    console.log('AI分析成功:', data);
-  };
-
   return (
     <div className="min-h-screen bg-[#F8F9FE]">
-      {/* 引用紫色导航栏组件 */}
+      {/* 恢复你原本的紫色导航栏 */}
       <GamificationHeader />
       
       <main className="max-w-4xl mx-auto p-4 pt-24">
@@ -20,12 +15,8 @@ export default function Home() {
             <span className="w-2 h-8 bg-purple-600 rounded-full"></span>
             智能拍照录入
           </h2>
-          
-          {/* 引用核心上传组件 */}
-          <ImageUploader 
-            onResult={handleResults} 
-            subject="数学" 
-          />
+          {/* 引用拍照录入组件 */}
+          <ImageUploader onResult={(data) => console.log(data)} subject="数学" />
         </div>
       </main>
     </div>
