@@ -1,30 +1,22 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { Subject, AIAnalysis } from "../types";
 
-export default async function handler(req: any, res: any) {
-  // 只允许 POST 请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
+export const detectAndAnalyzeQuestions = async (
+  base64Images: string[],
+  subject: Subject
+): Promise<AIAnalysis[]> => {
+  
+  const systemPrompt = `你是一个教育专家。请分析图中的题目并返回JSON数组。`;
 
-  // 从环境变量读取 KEY，这在服务器端是安全的，前端不可见
-  const genAI = new GoogleGenerativeAI(process.env.VITE_GEMINI_API_KEY || '');
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // 请求本地 api 路径
+  const response = await fetch('/api/analyze', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ images: base64Images, systemPrompt })
+  });
 
-  try {
-    const { images, systemPrompt } = req.body;
-    
-    // 这里的请求发生在 Vercel 服务器和 Google 之间，避开了浏览器兼容性问题
-    const result = await model.generateContent([
-      systemPrompt,
-      ...images.map((img: string) => ({
-        inlineData: { data: img, mimeType: "image/jpeg" }
-      }))
-    ]);
+  if (!response.ok) throw new Error('AI 分析失败');
+  const resultText = await response.json();
+  return JSON.parse(resultText);
+};
 
-    const response = await result.response;
-    res.status(200).json(response.text());
-  } catch (error: any) {
-    console.error('API Error:', error);
-    res.status(500).json({ error: error.message });
-  }
-}
+export const generateWeakPointAnalysis = async () => ({ summary: '', weakPoints: [], overallLevel: '' });
