@@ -1,0 +1,7 @@
+{
+  "name": "嘟嘟错题本 (Dudu's Smart Notebook)",
+  "description": "专为嘟嘟打造的智能错题本。支持全科拍照上传、AI 自动分析、智能组卷与成长勋章，记录进步的每一步。",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
