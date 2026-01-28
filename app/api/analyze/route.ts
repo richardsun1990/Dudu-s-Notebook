@@ -4,14 +4,13 @@ import { NextResponse } from 'next/server';
 export async function POST(req: Request) {
   try {
     const { images, systemPrompt } = await req.json();
-    
-    // 从环境变量中安全获取 KEY
-    const apiKey = process.env.VITE_GEMINI_API_KEY;
-    if (!apiKey) return NextResponse.json({ error: 'Missing API KEY' }, { status: 500 });
+    const apiKey = process.env.VITE_GEMINI_API_KEY; // 从服务器环境读取
 
+    if (!apiKey) return NextResponse.json({ error: '服务器未配置 API KEY' }, { status: 500 });
+
+    // 使用正式版 v1 接口，避开不稳定的 v1beta
     const apiUrl = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
-    // 🔴 修复了上一版导致 500 错误的 JSON 格式问题
     const payload = {
       contents: [{
         parts: [
@@ -19,12 +18,11 @@ export async function POST(req: Request) {
           ...images.map((img: string) => ({
             inlineData: {
               mimeType: "image/jpeg",
-              data: img.includes(',') ? img.split(',')[1] : img
+              data: img.includes(',') ? img.split(',')[1] : img // 过滤 base64 前缀
             }
           }))
         ]
       }]
-      // 注意：暂时移除导致报错的 generationConfig
     };
 
     const response = await fetch(apiUrl, {
@@ -34,10 +32,10 @@ export async function POST(req: Request) {
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.error?.message || 'Google API Error');
+    if (!response.ok) throw new Error(data.error?.message || 'Google API 响应错误');
 
-    const resultText = data.candidates[0].content.parts[0].text;
-    return NextResponse.json({ text: resultText });
+    // 返回 AI 识别的文本内容
+    return NextResponse.json({ text: data.candidates[0].content.parts[0].text });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
