@@ -3,21 +3,19 @@ import { Subject, AIAnalysis, MistakeRecord, WeakPointAnalysis } from "../types"
 
 const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
-const genModel = ai.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
-  systemInstruction: systemPrompt 
-});
-
 export const detectAndAnalyzeQuestions = async (
-  base64Images: string[], 
+  base64Images: string[],
   subject: Subject
 ): Promise<AIAnalysis[]> => {
-  // 切换为 Flash 模型以大幅提升识别速度
-  const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
-  
+
   const systemPrompt = `你是一个资深的小学${subject}教育专家。
-  用户上传了[${base64Images.length}]张作业照片。
-  请快速识别并分析图中包含的**所有独立题目**。
+请快速识别并分析图中包含的所有独立题目。
+必须严格输出 JSON 数组格式。`;
+  
+const genModel = ai.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    systemInstruction: systemPrompt 
+  });
   
   关键要求：
   1. 准确提取题目文本、题型、参考答案和精简解析。
