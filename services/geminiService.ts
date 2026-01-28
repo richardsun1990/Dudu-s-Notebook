@@ -56,10 +56,10 @@ export const detectAndAnalyzeQuestions = async (
               type: SchemaType.ARRAY,
               items: { type: SchemaType.STRING }
             },
-            sourceImageIndex: { type: Type.NUMBER },
+            sourceImageIndex: { type: SchemaType.NUMBER },
             boundingBox: {
               type: SchemaType.ARRAY,
-              items: { type: Type.NUMBER },
+              items: { type: SchemaType.NUMBER },
               description: "[ymin, xmin, ymax, xmax]"
             }
           },
