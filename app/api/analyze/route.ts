@@ -7,8 +7,9 @@ export async function POST(req: Request) {
 
     if (!apiKey) return NextResponse.json({ error: 'Missing API KEY' }, { status: 500 });
 
-    // 注意这里改成了 v1beta，解决之前的 404 模型找不到问题
-    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // app/api/analyze/route.ts
+// 将 apiUrl 修改为 v1beta 版本
+const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
     const payload = {
       contents: [{
