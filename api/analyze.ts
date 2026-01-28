@@ -3,38 +3,38 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
 
-  // 🔴 这里的变量名必须与 Vercel 后台设置的一模一样
   const apiKey = process.env.VITE_GEMINI_API_KEY;
-  
-  if (!apiKey) {
-    return res.status(500).json({ error: 'Vercel 环境变量中缺少 VITE_GEMINI_API_KEY' });
-  }
+  if (!apiKey) return res.status(500).json({ error: 'Missing API KEY' });
 
+  // 🔴 关键修复：强制初始化时指定 apiVersion
   const genAI = new GoogleGenerativeAI(apiKey);
-  // 确保使用 flash 模型以降低延迟
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
+  
   try {
     const { images, systemPrompt } = req.body;
-    
-    // 增加数据完整性检查
-    if (!images || images.length === 0) {
-      return res.status(400).json({ error: '未接收到图片数据' });
-    }
+
+    // 手动拼接模型路径，避开 SDK 的版本拼接 Bug
+    const model = genAI.getGenerativeModel({ 
+      model: "gemini-1.5-flash"
+    }, { apiVersion: 'v1beta' }); // 显式声明版本
 
     const result = await model.generateContent([
-      systemPrompt,
+      { text: systemPrompt },
       ...images.map((img: string) => ({
-        inlineData: { data: img.split(',')[1] || img, mimeType: "image/jpeg" }
+        inlineData: { 
+          // 处理 base64，去掉可能存在的 data:image/jpeg;base64, 前缀
+          data: img.includes(',') ? img.split(',')[1] : img, 
+          mimeType: "image/jpeg" 
+        }
       }))
     ]);
 
     const response = await result.response;
     const text = response.text();
-    // 🔴 务必确保返回的是纯文本，前端会负责解析
+    
+    // 返回给前端
     res.status(200).json(text);
   } catch (error: any) {
-    console.error('Gemini Backend Error:', error);
-    res.status(500).json({ error: error.message || 'AI 服务响应超时或配置错误' });
+    console.error('Backend Detail:', error);
+    res.status(500).json({ error: error.message });
   }
 }
