@@ -6,8 +6,8 @@ export default async function handler(req: any, res: any) {
 
   const { images, systemPrompt } = req.body;
 
-  // 🔴 关键点：手动构造 Google 官方标准 REST 接口地址，不再让 SDK 乱猜
-  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+  // 🔴 核心修改：切换到 gemini-1.5-flash-latest，这是一个更兼容的别名
+  const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
   const payload = {
     contents: [{
@@ -36,14 +36,14 @@ export default async function handler(req: any, res: any) {
     const data = await googleResponse.json();
 
     if (!googleResponse.ok) {
+      // 如果 flash-latest 还是不行，这里会抛出 Google 的原始错误原因
       throw new Error(data.error?.message || 'Google API 响应错误');
     }
 
-    // 提取 AI 返回的文本
     const aiText = data.candidates[0].content.parts[0].text;
     res.status(200).json(aiText);
   } catch (error: any) {
-    console.error('REST API Error:', error);
+    console.error('Final Plan Error:', error);
     res.status(500).json({ error: error.message });
   }
 }
