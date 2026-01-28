@@ -2,7 +2,7 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { Subject, AIAnalysis, MistakeRecord, WeakPointAnalysis } from "../types";
 
-const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '
+onst ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
 
 export const detectAndAnalyzeQuestions = async (
   base64Images: string[], 
