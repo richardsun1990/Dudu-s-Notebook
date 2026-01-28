@@ -8,10 +8,9 @@ export const detectAndAnalyzeQuestions = async (
   base64Images: string[], 
   subject: Subject
 ): Promise<AIAnalysis[]> => {
-  // 切换为 Flash 模型以大幅提升识别速度
   const model = 'gemini-3-flash-preview';
   
-  const systemPrompt = `你是一个资深的小学${subject}教育专家。
+  const systemPrompt = `你是一个资深的小学${subject}教育专家，正在为三年级学生“嘟嘟”分析题目。
   用户上传了[${base64Images.length}]张作业照片。
   请快速识别并分析图中包含的**所有独立题目**。
   
@@ -87,12 +86,21 @@ export const generateWeakPointAnalysis = async (
     text: m.analysis?.questionText.substring(0, 50) + '...'
   }));
 
-  const prompt = `分析以下学生的错题记录，指出薄弱环节。
+  const prompt = `你是一位专门辅导三年级学生“嘟嘟”的资深家庭教育导师。
   
-  数据：${JSON.stringify(simplifiedData)}
+  请基于以下错题数据进行深度复盘：
+  ${JSON.stringify(simplifiedData)}
   
-  请提供学习现状总结(summary)、具体的薄弱知识点分析(weakPoints)及综合评估(overallLevel)。
-  输出为JSON。`;
+  你的目标是：
+  1. **总结现状(summary)**：用鼓励性、温暖的语言指出嘟嘟目前的进步和核心挑战。
+  2. **定位薄弱点(weakPoints)**：不仅要指出知识点，还要分析“为什么错”（如概念不清、粗心、逻辑断层）。
+  3. **提供辅导方案(suggestion)**：给家长的具体建议，例如：
+     - “生活化练习”：生活中如何引导？
+     - “小游戏”：如何通过游戏化学习？
+     - “避坑指南”：下次遇到这类题要注意什么？
+  4. **综合等级(overallLevel)**：一个有趣的称号。
+
+  输出为规范的JSON格式。`;
 
   const response = await ai.models.generateContent({
     model,
