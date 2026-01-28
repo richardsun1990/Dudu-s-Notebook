@@ -1,7 +1,7 @@
-'use client'; // Next.js 客户端组件标识
+'use client';
 import React, { useState } from 'react';
 
-export default function ImageUploader({ onResult }: { onResult: (data: any) => void }) {
+export default function ImageUploader({ onResult, subject }: any) {
   const [loading, setLoading] = useState(false);
   const [previews, setPreviews] = useState<string[]>([]);
 
@@ -20,33 +20,34 @@ export default function ImageUploader({ onResult }: { onResult: (data: any) => v
   const startScan = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/analyze', { // 请求刚才创建的路由
+      const res = await fetch('/api/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ images: previews, systemPrompt: "请识别题目并转为JSON" })
+        body: JSON.stringify({ images: previews, systemPrompt: `请识别小学${subject}题目` })
       });
       const data = await res.json();
       if (data.error) throw new Error(data.error);
-      onResult(JSON.parse(data.text));
+      onResult(data.text);
+      alert('分析完成！请查看控制台。');
     } catch (err: any) {
-      alert("识别失败: " + err.message);
+      alert("错误: " + err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="space-y-4">
-      <input type="file" multiple accept="image/*" onChange={handleUpload} className="block w-full text-sm" />
-      <div className="flex gap-2 flex-wrap">
-        {previews.map((src, i) => <img key={i} src={src} className="w-20 h-20 object-cover rounded" />)}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+      <input type="file" multiple accept="image/*" onChange={handleUpload} />
+      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        {previews.map((src, i) => <img key={i} src={src} style={{ width: '80px', height: '80px', borderRadius: '8px' }} />)}
       </div>
       <button 
         onClick={startScan} 
         disabled={loading || previews.length === 0}
-        className="w-full bg-blue-600 text-white py-3 rounded-lg disabled:bg-gray-400"
+        style={{ padding: '12px', backgroundColor: loading ? '#ccc' : '#4F46E5', color: 'white', border: 'none', borderRadius: '8px', cursor: 'pointer' }}
       >
-        {loading ? 'AI 正在分析中...' : '开始智能扫描'}
+        {loading ? 'AI 正在努力分析...' : '开始智能扫描'}
       </button>
     </div>
   );
