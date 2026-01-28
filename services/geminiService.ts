@@ -1,4 +1,4 @@
-import { GoogleGenerativeAI } from "@google/generative-ai"; 
+import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { Subject, AIAnalysis, MistakeRecord, WeakPointAnalysis } from "../types";
 
 const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
@@ -42,23 +42,23 @@ export const detectAndAnalyzeQuestions = async (
       systemInstruction: systemPrompt,
       responseMimeType: "application/json",
       responseSchema: {
-        type: Type.ARRAY,
+        type: SchemaType.ARRAY,
         items: {
-          type: Type.OBJECT,
+          type: SchemaType.OBJECT,
           properties: {
-            questionText: { type: Type.STRING },
-            questionType: { type: Type.STRING },
-            originalAnswer: { type: Type.STRING },
-            correctAnswer: { type: Type.STRING },
-            explanation: { type: Type.STRING },
-            difficulty: { type: Type.STRING },
+            questionText: { type: SchemaType.STRING },
+            questionType: { type: SchemaType.STRING },
+            originalAnswer: { type: SchemaType.STRING },
+            correctAnswer: { type: SchemaType.STRING },
+            explanation: { type: SchemaType.STRING },
+            difficulty: { type: SchemaType.STRING },
             tags: {
-              type: Type.ARRAY,
-              items: { type: Type.STRING }
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING }
             },
             sourceImageIndex: { type: Type.NUMBER },
             boundingBox: {
-              type: Type.ARRAY,
+              type: SchemaType.ARRAY,
               items: { type: Type.NUMBER },
               description: "[ymin, xmin, ymax, xmax]"
             }
