@@ -2,7 +2,11 @@ import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { Subject, AIAnalysis, MistakeRecord, WeakPointAnalysis } from "../types";
 
 const ai = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-const genModel = ai.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+const genModel = ai.getGenerativeModel({ 
+  model: "gemini-1.5-flash",
+  systemInstruction: systemPrompt 
+});
 
 export const detectAndAnalyzeQuestions = async (
   base64Images: string[], 
@@ -39,7 +43,6 @@ export const detectAndAnalyzeQuestions = async (
       ],
     },
    generationConfig: {
-      systemInstruction: systemPrompt,
       responseMimeType: "application/json",
       responseSchema: {
         type: SchemaType.ARRAY,
